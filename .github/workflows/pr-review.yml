@@ -25,7 +25,6 @@ jobs:
         run: |
           ollama serve &
           sleep 5
-          ollama pull qwen2.5-coder
 
       - name: Run PR Review Agent (AI-powered)
         env:
