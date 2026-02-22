@@ -1,0 +1,36 @@
+name: Auto PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run PR Review Agent (AI-powered)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          python pr_review_agent.py "$PR_URL" --ai --model qwen2.5-coder
+
+      - name: Run PR Review Agent (Rule-based fallback)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          python pr_review_agent.py "$PR_URL"
