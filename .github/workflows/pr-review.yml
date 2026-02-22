@@ -6,7 +6,8 @@ on:
 
 jobs:
   review:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,17 +21,15 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Start Ollama
+        run: |
+          ollama serve &
+          sleep 5
+          ollama pull qwen2.5-coder
+
       - name: Run PR Review Agent (AI-powered)
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           python pr_review_agent.py "$PR_URL" --ai --model qwen2.5-coder
-
-      - name: Run PR Review Agent (Rule-based fallback)
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: |
-          python pr_review_agent.py "$PR_URL"
