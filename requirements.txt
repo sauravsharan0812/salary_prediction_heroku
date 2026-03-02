@@ -10,5 +10,4 @@ scikit-learn>=0.18
 matplotlib>=1.4.3
 pandas>=0.19
 python3
-
-
+requests>=2.28.0
